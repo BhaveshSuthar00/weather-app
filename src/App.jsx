@@ -9,6 +9,7 @@ function App() {
     if( 'geolocation' in navigator){
       navigator.geolocation.getCurrentPosition(
         function success (position) {
+          console.log(position);
           alert('latitude', position.coords.latitude, 
           'longitude', position.coords.longitude);
         },
