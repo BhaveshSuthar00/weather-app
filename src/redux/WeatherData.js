@@ -12,10 +12,9 @@ const slice = createSlice({
     },
     reducers : {
         GetAllData : (state, action) => {
-            console.log(action.payload, ' this hs the action')
             state.data = {...action.payload};
         },
-        SetCurrentData : (state, action) => { 
+        SetCurrentDate : (state, action) => { 
             state.currentData = action.payload;
          },
         SetLocation : (state, action) => {
@@ -27,23 +26,20 @@ const slice = createSlice({
         }
     }
 })
-const {
+export const {
     GetAllData,
-    SetCurrentData,
+    SetCurrentDate,
     setsearchField,
     SetLocation
 } = slice.actions;
 export const filterArr = (list) => {
     let arr = [];
-    let current = list[0].dt_txt.split(' ')[1];
-    let arrIndex = 0;
     let dateArr = [];
     for(let i = 0; i< list.length ; i++) {
         let dt = list[i].dt_txt.split(' ')[0];
         if(!dateArr.includes(dt)) dateArr.push(dt);
     }
     for(let i = 0; i < dateArr.length; i++){
-        
         let list2 = list.filter((item) => {
             if(item.dt_txt.split(' ')[0] === dateArr[i]) return item;
         })
@@ -51,15 +47,16 @@ export const filterArr = (list) => {
     }
     return arr;
 }
-export const getData = (lon, lat) => async dispatch => {
+export const getData = (lon, lat, searchIs) => async dispatch => {
     try {
-        let weatherData = await axios.get(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${'f324a4e7b9ae7a804143957d831228a8'}`);
+        let weatherData = await axios.get(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${API_key}`);
         let finalList = filterArr(weatherData.data.list);
         let obj = {
             ...weatherData.data,
+            searchIs : searchIs,
             list : finalList,
         }
-        console.log(obj, finalList);
+        console.log(obj,'obj  rrth tehtert')
         dispatch(GetAllData({...obj}));
     }
     catch (err) {
@@ -68,13 +65,15 @@ export const getData = (lon, lat) => async dispatch => {
 }
 export const weatherList = async (lon, lat) => {
     try {
-        const weatherFor = await axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${'e4c70ce6a6821649a416cb9521d5f4f8'}`);
+        const weatherFor = await axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${API_key}`);
+        console.log(weatherFor.data, 'this is the hole list')
         const {
             main, 
             coord,
+            sys,
             weather
         } = weatherFor.data;
-        return {...main, weather : weather[0], ...coord};
+        return {...main, weather : weather[0], sys, ...coord};
         
     }
     catch(err) {
@@ -108,6 +107,18 @@ export const searchWeather = (location) => async dispatch => {
         dispatch(setsearchField(list));
     }
     catch (err) {
+        console.log(err);
+    }
+}
+export const reverseGeo = (lon, lat) => async dispatch => {
+    try {   
+        // e4c70ce6a6821649a416cb9521d5f4f8
+        const response = await axios.get(`https://api.openweathermap.orggeo/1.0/reverse?lat=${lat}&lon=${lon}&appid=${API_key}`);
+        console.log(response.data)
+        if(response.data && response.data.length >= 1) dispatch(searchWeather(response.data[0].name));
+        else alert('not found the user location data try manually');
+    }
+    catch(err){
         console.log(err);
     }
 }

@@ -1,0 +1,97 @@
+import React, { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Line } from 'react-chartjs-2';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
+export const options = (currentTemp) => {
+    return {
+  responsive: true,
+  interaction: {
+    mode: 'index',
+    intersect: false,
+  },
+  stacked: false,
+  plugins: {
+    title: {
+      display: true,
+      text: `${currentTemp} deg`,
+    },
+  },
+  scales: {
+    y: {
+      type: 'linear',
+      display: false,
+      position: 'left' ,
+    }
+  },
+}};
+
+// const labels = ['januwery', 'we fdfsdf', 'we ewff', 'wef fdfsd', 'fwfjwefj']
+export const Chart = () => {
+    const { data, currentData } = useSelector((store) => store.weatherData);
+    console.log(data, currentData)
+    const [toggle, setToggle] = useState(false);
+      const [data23, setData] = useState({
+          labels : [],
+          datasets: [{
+                labels : 'degree',
+              data: [],
+              borderColor: 'rgb(255, 99, 132)',
+              backgroundColor: 'rgba(255, 99, 132, 0.5)',
+              yAxisID: 'y',
+          }]
+      });
+      function tConvert (time) {
+        time = time.toString ().match (/^([01]\d|2[0-3])(:)([0-5]\d)(:[0-5]\d)?$/) || [time];
+        if (time.length > 1) { 
+          time = time.slice(1);  
+          time[5] = +time[0] < 12 ? 'AM' : 'PM';
+          time[0] = +time[0] % 12 || 12; 
+        }
+        return time[0] + " " +time[5]; // return adjusted time or original string
+    }
+    useEffect(()=> {
+        if(!data.list) {
+            setToggle(false);
+            return;
+        };
+        let dataList = [-20];
+        data.list[currentData].map(({main}) => {
+            let cra = Math.ceil(main.temp);
+            dataList.push(cra);
+        })
+        let maxValue = Math.max(...dataList);
+        dataList.push(maxValue + 10);
+        setData({...data23, 
+            labels : data.list[currentData].map(({dt_txt}) => {
+                return tConvert(dt_txt.split(' ')[1]);
+            }), 
+            datasets : [{...data23.datasets, data : dataList}]
+        })
+        setToggle(true);
+        return(()=> {
+            setToggle(false);
+        })
+    }, [data, currentData])
+    if(!toggle) return;
+    return <Line options={options(data23.datasets[0].data[Math.ceil(data23.datasets[0].data.length/2)])} data={data23} />;
+}

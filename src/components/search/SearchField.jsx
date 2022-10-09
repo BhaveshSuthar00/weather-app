@@ -1,8 +1,9 @@
-import { Box, Image, Input, Text } from '@chakra-ui/react';
+import { Box, Image, Input, InputGroup, InputLeftAddon, InputLeftElement, InputRightElement, Text } from '@chakra-ui/react';
 import React, { useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { getData, searchWeather } from '../../redux/WeatherData';
 import { v4 as uuid } from 'uuid';
+import { MdLocationOn, MdSearch } from 'react-icons/md'
 export const SearchField = () => {
     const interval = useRef();
     const { searchField } = useSelector((store) => store.weatherData);
@@ -10,7 +11,7 @@ export const SearchField = () => {
     const [toggle, setToggle] = useState(false);
     const dispatch = useDispatch();
     const BoxClick = (lon, lat, searchIs)=> {
-        dispatch(getData(lon, lat));
+        dispatch(getData(lon, lat, searchIs));
         setSearch(searchIs.name + ', ' + searchIs.region);
         setToggle(true);
     }
@@ -28,33 +29,41 @@ export const SearchField = () => {
     }
     return (
         <>
-            <Box w={'90%'} m='auto' mt={3}>
+            <Box  m='auto' margin={2}
+                position='relative'
+            >
                 <Box>
                     <form onSubmit={searchFun}>
-                        <Input type={'text'} placeholder='search' value={search.toLowerCase()} onChange={handleChange}/>
+                        <InputGroup>
+                            <InputLeftElement children={ <MdLocationOn color={'black.800'} fontSize={'21'} />} />
+                            <Input type={'text'} placeholder='search' value={search.toLowerCase()} onChange={handleChange}/>
+                            <InputRightElement children={ <MdSearch color={'black.800'} fontSize={'21'} />} />
+                        </InputGroup>
                     </form>
                 </Box>
                 <Box
                     position={'absolute'}
-                    w={'full'}
+                    w={'100%'}
                     zIndex={200}
                     backgroundColor='white'
                 >
                     {
                         toggle === false && searchField && searchField.map(({lon, lat, searchIs, weather, temp})=>  {
-                            return <Box key={uuid()} display={'flex'} justifyContent={'space-around'} alignItems='center' boxShadow={'md'} cursor={'pointer'} m={2} p={[2,1]} onClick={()=> BoxClick(lon, lat, searchIs)}
-                                
+                            return <Box key={uuid()} display={'flex'} justifyContent={'space-between'} alignItems='center' boxShadow={'md'} cursor={'pointer'} m={2} 
+                            borderRadius={'4%'}
+                            margin={2}
+                            backgroundColor='whiteAlpha.900'
+                            onClick={()=> BoxClick(lon, lat, searchIs)}
                             >
                                 <Box>
-                                    <Text>
+                                    <Text as="strong">
                                         {searchIs.name}, {searchIs.region}
                                     </Text>
                                 </Box>
                                 <Box display={'flex'} justifyContent='space-between' textAlign={'center'} alignItems='center'>
                                     <Box>
                                     <Text>
-                                        <Text as='span'> { Math.round(temp) } </Text> 
-                                        <Text as='span'>  &#8451; </Text>
+                                        <Text as='strong'> { Math.round(temp) } &#8451;</Text> 
                                     </Text>
                                     <Text>
                                         { weather.main }
