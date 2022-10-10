@@ -7,12 +7,13 @@ import { SetCurrentDate } from '../../redux/WeatherData';
 const Forcast = () => {
     const { data, currentData } = useSelector((store)=> store.weatherData);
     const dispatch = useDispatch();
-    if(!data.list) return;
+    console.log(data)
+    if(!data.list2) return;
     return (
     <>
         <Box display={'flex'} margin={2} p={1}>
             {
-                data.list && data.list.map((item, index)=> 
+                data.list2 && data.list2.map((item, index)=> 
                 (
                     <Box key={uuid()} display='flex' flexDir={'column'} textAlign='center' justifyContent={'space-evenly'} m={1} 
                     boxShadow='lg' 

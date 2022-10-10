@@ -13,7 +13,7 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import { Box, Text } from '@chakra-ui/react';
-import { current } from '@reduxjs/toolkit';
+import moment from 'moment';
 
 ChartJS.register(
     CategoryScale,
@@ -42,17 +42,16 @@ export const options = (currentTemp) => {
 };
 export const Chart = () => {
     const { data, currentData } = useSelector((store) => store.weatherData);
-    console.log(data, currentData)
     const [toggle, setToggle] = useState(false);
       const [data23, setData] = useState({
           labels : [],
           datasets: [
                 {
-                    fill: true,
                     label: 'Temperature',
                     data: [],
-                borderColor: 'rgb(53, 162, 235)',
-                backgroundColor: 'rgba(53, 162, 235, 0.5)',
+                    fill: true,
+                    borderColor: 'rgb(53, 162, 235)',
+                    backgroundColor: 'rgba(53, 162, 235, 0.5)',
                 }
             ]
       });
@@ -66,26 +65,28 @@ export const Chart = () => {
         return time[0] + " " +time[5]; // return adjusted time or original string
     }
     useEffect(()=> {
-        if(!data.list) {
+        console.log(moment(1665294104).format('hh:mm a'))
+        console.log(moment(1665328801).format('hh:mm a'))
+        
+        if(!data.list2) {
             setToggle(false);
             return;
         };
         let dataList = [];
-        console.log(data.list[currentData]);
-        data.list[currentData].map(({main}) => {
+        data.list2[currentData].map(({main}) => {
             let cra = Math.ceil(main.temp);
             dataList.push(cra);
         })
         let maxValue = Math.max(...dataList);
-        dataList.push(maxValue + 10);
+        dataList.push(maxValue + 3);
         setData({...data23, 
-            labels : data.list[currentData].map(({dt_txt}) => {
+            labels : data.list2[currentData].map(({dt_txt}) => {
                 return tConvert(dt_txt.split(' ')[1]);
             }), 
             datasets : [{
                 ...data23.datasets,  
-                label: 'Temperature', 
                 data : dataList,
+                label: 'Temperature', 
                 fill: true,
                 borderColor: 'rgb(53, 162, 235)',
                 backgroundColor: 'rgba(53, 162, 235, 0.5)',
@@ -102,22 +103,34 @@ export const Chart = () => {
             <Box m={4}>
                 <Line options={options(data23.datasets[0].data[Math.ceil(data23.datasets[0].data.length/2)])} data={data23} />
             </Box>
-            <Box display={'flex'} justifyContent={'space-around'} w="85%" p={4}  boxShadow='md' m={4}>
-                <Box>
+            <Box display={'flex'} justifyContent={'center'} w="85%" p={4}  boxShadow='md' m={4}>
+                <Box flex={1} textAlign={'center'}>
                     <Text as='strong'>Pressure</Text>
                     <Text>
-                        {data.list[currentData][0].main.pressure} hpa
+                        {data.list2[currentData][0].main.pressure} hpa
                     </Text>
                 </Box>
-                <Box>
+                <Box flex={1} textAlign={'center'}>
                     <Text as='strong'>
                             Humidity
                     </Text>
                     <Text>
-                        {data.list[currentData][0].main.humidity} &#37; 
+                        {data.list2[currentData][0].main.humidity} &#37; 
                     </Text>
                 </Box>
+                <Box>
+                </Box>
             </Box>
+            {/* <Box display={'flex'} justifyContent={'center'} w="85%" p={4}  boxShadow='md' m={4}>
+                <Text as={'strong'} flex={1} textAlign={'left'}>
+                    {
+                        moment(data.city.sunrise).format('hh:mm a')
+                    }
+                </Text>
+                <Text as={'strong'} flex={1} textAlign={'right'}>
+                {moment(data.city.sunset).format('hh:mm a')}
+                </Text>
+            </Box> */}
         </>
     )
 }

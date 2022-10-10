@@ -42,6 +42,7 @@ export const filterArr = (list) => {
     for(let i = 0; i < dateArr.length; i++){
         let list2 = list.filter((item) => {
             if(item.dt_txt.split(' ')[0] === dateArr[i]) return item;
+            else return null;
         })
         arr.push(list2);
     }
@@ -52,11 +53,10 @@ export const getData = (lon, lat, searchIs) => async dispatch => {
         let weatherData = await axios.get(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${API_key}`);
         let finalList = filterArr(weatherData.data.list);
         let obj = {
+            list2 : finalList,
             ...weatherData.data,
-            searchIs : searchIs,
-            list : finalList,
         }
-        console.log(obj,'obj  rrth tehtert')
+        dispatch(SetCurrentDate(0));
         dispatch(GetAllData({...obj}));
     }
     catch (err) {
@@ -80,7 +80,7 @@ export const weatherList = async (lon, lat) => {
         console.log(err);
     }
 }
-export const searchWeather = (location) => async dispatch => {
+export const searchWeather = (location, share = false) => async dispatch => {
     try {
         if(location.length <= 1) {
             dispatch(setsearchField([]));
@@ -97,14 +97,20 @@ export const searchWeather = (location) => async dispatch => {
             dispatch(setsearchField([]));
             return;
         } 
+        // if(share) {
+        //     const { latitude , longitude } = searchIs.data.data[0];
+        //     console.log(longitude, latitude, 'this is share')
+        //     dispatch(getData(longitude, latitude)); 
+        // }
         let list = [];
         await Promise.all(
             searchIs.data.data.map(async ({latitude, longitude}, index) => {
                 const response = await weatherList(longitude, latitude);
-                list.push({...response, searchIs : searchIs.data.data[index]});
+                list.push({searchIs : searchIs.data.data[index], ...response});
             })
         )
         dispatch(setsearchField(list));
+        return list;
     }
     catch (err) {
         console.log(err);
@@ -113,9 +119,12 @@ export const searchWeather = (location) => async dispatch => {
 export const reverseGeo = (lon, lat) => async dispatch => {
     try {   
         // e4c70ce6a6821649a416cb9521d5f4f8
-        const response = await axios.get(`https://api.openweathermap.orggeo/1.0/reverse?lat=${lat}&lon=${lon}&appid=${API_key}`);
-        console.log(response.data)
-        if(response.data && response.data.length >= 1) dispatch(searchWeather(response.data[0].name));
+        console.log(lon, lat, 'this is this')
+        const response = await axios.get(`https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lon}&appid=${'e4c70ce6a6821649a416cb9521d5f4f8'}`);
+        if(response.data && response.data.length >= 1) {
+            // let curr = dispatch(searchWeather(response.data[0].name));
+            dispatch(getData(lon, lat));
+        }
         else alert('not found the user location data try manually');
     }
     catch(err){
