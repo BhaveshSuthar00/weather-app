@@ -7,7 +7,6 @@ import { SetCurrentDate } from '../../redux/WeatherData';
 const Forcast = () => {
     const { data, currentData } = useSelector((store)=> store.weatherData);
     const dispatch = useDispatch();
-    console.log(data)
     if(!data.list2) return;
     return (
     <>

@@ -1,11 +1,12 @@
-import { Box, Text } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { Box, Button, Input, Text } from "@chakra-ui/react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { SearchField } from "./components/search/SearchField";
 import { Chart } from "./components/Weather/Chart";
 import Forcast from "./components/Weather/Forcast";
 import { getData, reverseGeo } from "./redux/WeatherData";
-
+import React from "react";
+import { ApexChart } from "./components/Weather/ApexChart";
 function App() {
   const dispatch = useDispatch();
   const { data } = useSelector((store) => store.weatherData);
@@ -24,15 +25,19 @@ function App() {
   }, [])
   return (
     <>
-      <Box w="60%" justifyContent={'center'} display={'flex'} flexDir='column'  margin={'auto'} boxShadow={data.list ? '2xl' : null}
+      <Box 
+      w="60%" 
+      justifyContent={'center'} display={'flex'} flexDir='column'  margin={'auto'} boxShadow={data.list ? '2xl' : null}
       rounded='md' bg='white' p={5}
       >
         <SearchField />
         <Forcast />
-        <Chart />
+        <ApexChart />
       </Box>
+
     </>
   );
+  
 }
 
 export default App;
