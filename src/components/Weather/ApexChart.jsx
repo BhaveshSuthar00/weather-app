@@ -10,7 +10,7 @@ export const ApexChart = () => {
     const { data, currentData } = useSelector((store) => store.weatherData);
     const [toggle, setToggle] = useState(false);
     const [sunRise, setSunRise] = useState({
-        series: [ Math.ceil(new Date().getHours() * 100 / 24)],
+        series: [ currentData === 0 ? Math.ceil(new Date().getHours() * 100 / 24) : 0],
         dropShadow: {
             enabled: true,
             top: 30,
@@ -52,7 +52,7 @@ export const ApexChart = () => {
                 },
                 value: {
                   fontSize: "30px",
-                  show: true,
+                  show: currentData === 0 ? true : false,
                   offsetY : -23,
                   formatter: function (val) {
                     return moment().format('hh:mm a') 
@@ -79,7 +79,10 @@ export const ApexChart = () => {
       const [data23, setData] = useState({
             options: {
                 chart: {
-                  id: "basic-bar"
+                  id: "basic-bar",
+                  zoom : {
+                    enabled : false
+                  }
                 },
                 xaxis: {
                   categories: []
@@ -133,7 +136,43 @@ export const ApexChart = () => {
                 }
             ]
         })
-        console.log(data.city.sunrise,data.city.sunset, convertString(data.city.sunrise), convertString(data.city.sunset), new Date().getHours() * 100 / 24);
+        setSunRise({...sunRise, options : {...sunRise.options, plotOptions : {
+            offsetX: 0,
+            offsetY: 0,
+            radialBar: {
+                hollow : {
+                    margin: 15,
+                    size: "93%",
+                },
+              startAngle: -90,
+              endAngle: 90,
+              track: {
+                background: 'black',
+                startAngle: -90,
+                endAngle: 90,
+                dropShadow: {
+                    enabled: true,
+                    top: 5,
+                    left: 4,
+                    blur: 1,
+                    opacity: 0.6
+                }
+              },
+              dataLabels: {
+                name: {
+                  show: false,
+                },
+                value: {
+                  fontSize: "30px",
+                  show: currentData === 0 ? true : false,
+                  offsetY : -23,
+                  formatter: function (val) {
+                    return moment().format('hh:mm a') 
+                  }
+                }
+              }
+            }
+          }}})
         setToggle(true);
         return(()=> {
             setToggle(false);
@@ -163,7 +202,7 @@ export const ApexChart = () => {
             </Box>
             <Box boxShadow={'2xl'}
 
-             h={ currentData === 0 ? '230px' : '70px' } 
+             h={ currentData === 0 ? '230px' : '230px' } 
             overflow='hidden'
             m={4}
             position='relative'
@@ -186,9 +225,9 @@ export const ApexChart = () => {
                         { moment(convertString(data.city.sunset)).format('h') } PM
                     </Text>
                 </Box>
-                { currentData === 0 &&
+                {/* { currentData === 0 && */}
                 <Chart options={sunRise.options} dropShadow={sunRise.dropShadow} height={'400'} width={'100%'} series={sunRise.series} type="radialBar"/>
-                }
+                {/* } */}
 
             </Box>
         </>
