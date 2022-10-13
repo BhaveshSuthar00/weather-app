@@ -1,10 +1,10 @@
-import { Box, Button, Input, Text } from "@chakra-ui/react";
-import { useEffect, useRef, useState } from "react";
+import { Box } from "@chakra-ui/react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { SearchField } from "./components/search/SearchField";
 import { Chart } from "./components/Weather/Chart";
 import Forcast from "./components/Weather/Forcast";
-import { getData, reverseGeo } from "./redux/WeatherData";
+import { reverseGeo } from "./redux/WeatherData";
 import React from "react";
 import { ApexChart } from "./components/Weather/ApexChart";
 function App() {
