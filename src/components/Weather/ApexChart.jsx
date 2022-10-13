@@ -200,12 +200,11 @@ export const ApexChart = () => {
                     </Text>
                 </Box>
             </Box>
-            <Box boxShadow={'2xl'}
-
-             h={ currentData === 0 ? '230px' : '230px' } 
-            overflow='hidden'
-            m={4}
-            position='relative'
+            <Box 
+                h={ currentData === 0 ? '230px' : '230px' } 
+                overflow='hidden'
+                m={4}
+                position='relative'
             >
                 <Box position={'absolute'} fontSize={'21'} left={1} textAlign='center' w={'40%'} zIndex='1000'
                 >
